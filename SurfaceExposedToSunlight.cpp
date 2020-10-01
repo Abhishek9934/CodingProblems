@@ -1,3 +1,10 @@
+/* There is one assumption that I have taken that there are no buildings on the
+  left side of the source of light. This code works coorectly for all the buildings
+  lying after the x coordinate of the source of light.
+ For the buildings lying on the left side of source a similar approch will do,
+ but to time constraint I have not implemented it.
+*/
+
 #include<bits/stdc++.h>
 using namespace std;
 struct point
@@ -5,20 +12,31 @@ struct point
     float x;
     float y;
 };
-bool comp(point *a , point *b )
+
+void Sort(point buildings[][4], int n)
 {
-    return a[0].x < b[0].x;
+    for(int i = 0;i< n ;i++)
+    {
+        for(int j = i+1 ; j < n ;j++)
+        {
+            if(buildings[i][0].x > buildings[j][0].x)
+            {
+                swap(buildings[i] , buildings[j]);
+            }
+        }
+    }
+    
+    
 }
 
-float solve(point buildings[][4] , int n, point s)
+float solve(point buildings[][4], int n, point s)
 {
     float ans = 0.0;
     
 
-    // sort(buildings , buildings + n ,comp);
+    Sort(buildings , n);
     
     ans += (buildings[0][0].y - buildings[0][1].y);
-    // cout<< ans <<"kjdjd";
     float maxht = s.y;
     int f = 0 ;
     //first covering the length in the roof top of each building
@@ -31,18 +49,17 @@ float solve(point buildings[][4] , int n, point s)
          break;
          }
         ans += abs(buildings[i][0].x - buildings[i][3].x);
-        // ans += abs(buildings[i+1][1].y - buildings[i][0].y) - 
-        float extradistance = (buildings[i+1][1].x - buildings[i][2].x) * (s.y - buildings[i][3].y) /(s.x  - buildings[i][3].x );
+        float extradistance = abs(buildings[i+1][1].x - buildings[i][3].x) * abs(s.y - buildings[i][3].y) /abs(s.x  - buildings[i][3].x );
 
-        extradistance = min(extradistance , buildings[i+1][0].y - buildings[i+1][1].y );
+        extradistance = min(extradistance ,abs( buildings[i+1][0].y - buildings[i+1][1].y ));
 
         if(buildings[i+1][0].y >= buildings[i][0].y)
         {
-           ans += (buildings[i+1][0].y - buildings[i][3].y) + ( extradistance  );
+           ans += abs(buildings[i+1][0].y - buildings[i][3].y) + ( extradistance  );
         }
         else
         { 
-           ans += extradistance - (curr_y - buildings[i+1][0].y );
+           ans += extradistance - abs(curr_y - buildings[i+1][0].y );
         }
 
     }
